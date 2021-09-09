@@ -1,10 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
-import movieReducer from '../Features/Movies/MovieSlice'
-import userSlice from '../Features/User/UserSlice';
+import { configureStore } from '@reduxjs/toolkit';
+import appReducer from '../features/appSlice';
+import cameraReducer from '../features/cameraSlice';
 
 export const store = configureStore({
-     reducer: {
-          movie: movieReducer,
-          user: userSlice
-     },
-})
+  reducer: {
+    app: appReducer,
+    camera: cameraReducer
+  },
+});

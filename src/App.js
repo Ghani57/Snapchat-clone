@@ -1,55 +1,72 @@
-import React from 'react';
-import Header from './Components/Header';
-import Home from './Components/Home'
-import './App.css'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
-
-import Details from './Components/Details';
+import React, { useEffect } from 'react';
+import WebcamCapture from './Components/WebCamCapture'
+import './App.css';
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+import Preview from './Components/Preview';
+import Chats from './Components/Chats';
+import ChatView from './Components/ChatView';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser } from './features/appSlice';
 import Login from './Components/Login';
-import styled from 'styled-components';
-
+import { auth, } from './firebase';
+import {login, logout} from './features/appSlice'
 
 function App() {
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    auth.onAuthStateChanged((authUser) => {
+      if(authUser) {
+        dispatch(login({
+          username: authUser.displayName,
+          profilePic: authUser.photoURL,
+          id: authUser.uid,
+        }))
+      }
+      else{
+        dispatch(logout())
+      }
+    })
+  }, [])
+
   return (
     <div className="App">
       <Router>
-        <Header />
+        {!user ? (
+          <Login />
+        ) : (
+          <>
+          <img 
+          src="https://lakeridgenewsonline.com/wp-content/uploads/2020/04/snapchat.jpg" alt="SNAPCHAT" className="App_logo"
+          />
+          <h2 className="Logo">Snapchat Clone</h2>
+      <div className="AppBody">
+        <div className="app_Bg">
+          <Switch>
+          <Route path="/chats/view">
+              <ChatView />
+            </Route>
+            <Route path="/chats">
+              <Chats />
+            </Route>
+            
+            <Route path="/preview">
+              <Preview />
+            </Route>
 
-        <Switch>
-          <Route path="/detail/:id">
-            <Details />
-          </Route>
-
-          <Route path="/login">
-            <Login />
-          </Route>
-
-          <Route exact path="/">
-            <Home />
-          </Route>
-        </Switch>
-      </Router>
-      <AboutMe >
-          &copy;2021 Ghani Rehman CSE UET Mardan
-        </AboutMe>
+            <Route exact path="/">
+            <WebcamCapture />
+            </Route>
+          </Switch>
+          </div>
+        </div>
+        </>
+        )}
+      </Router>  
+      <h2 className="Logo">By: Ghani Rehman</h2>
     </div>
   );
 }
 
 export default App;
-
-const AboutMe = styled.div`
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    color: white;
-    margin-top: 10px;
-    font-size: 20px;
-    background-image: linear-gradient(to right, red, green);
-    padding: 8px;
-`
